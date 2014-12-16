@@ -1,16 +1,19 @@
 package main
 
 import (
-	// "fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
-	// "time"
-	// "strconv"
 )
 
-var messages chan string = make(chan string, 100)
+type Poll struct {
+	resultChan chan string
+	handler    func(w http.ResponseWriter, c chan string)
+	w          http.ResponseWriter
+}
+
+var polls []Poll
 
 func PushHandler(w http.ResponseWriter, req *http.Request) {
 
@@ -20,27 +23,28 @@ func PushHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	body := string(bod[:len(bod)])
-	messages <- body
+	pushIt(body)
 }
 
-func doResponse(w http.ResponseWriter) {
-	io.WriteString(w, <-messages+"\r\n")
-	if f, ok := w.(http.Flusher); ok {
-		f.Flush()
+func pushIt(message string) {
+	for i := range polls {
+		polls[i].resultChan <- message
 	}
-	doResponse(w)
 }
-func PollResponse(w http.ResponseWriter, req *http.Request) {
-	doResponse(w)
-	/*
-		io.WriteString(w, <-messages)
+
+func doResp(w http.ResponseWriter, c chan string) {
+	for {
+		io.WriteString(w, <-c+"\r\n")
 		if f, ok := w.(http.Flusher); ok {
 			f.Flush()
 		}
-		time.Sleep(2 * time.Second)
-		fmt.Fprintf(w, "\n\rbye2\r\n")
-	*/
+	}
+}
 
+func PollResponse(w http.ResponseWriter, req *http.Request) {
+	poll := Poll{make(chan string), doResp, w}
+	polls = append(polls, poll)
+	poll.handler(w, poll.resultChan)
 }
 
 func main() {
@@ -52,36 +56,3 @@ func main() {
 		log.Fatal("ListenAndServe: ", err)
 	}
 }
-
-/*
-package main
-
-import (
-	"fmt"
-	//	"io/ioutil"
-	//	"log"
-	"net/http"
-	"time"
-)
-
-func handler(response http.ResponseWriter, r *http.Request) {
-	This works for flushing and sleeping
-	fmt.Fprintf(response, "YOOOOOO\r\n")
-	if f, ok := response.(http.Flusher); ok {
-		f.Flush()
-	}
-	time.Sleep(1 * time.Second)
-	fmt.Fprintf(response, "hey\r\n")
-	if f, ok := response.(http.Flusher); ok {
-		f.Flush()
-	}
-	time.Sleep(2 * time.Second)
-	fmt.Fprintf(response, "bye2\r\n")
-}
-
-func main() {
-	lpchan := make(chan chan string)
-	http.HandleFunc("/", handler)
-	http.ListenAndServe(":8888", nil)
-}
-*/
