@@ -1,0 +1,25 @@
+{
+	"ImportPath": "github.com/cjellick/machine-agent",
+	"GoVersion": "go1.4",
+	"Deps": [
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-50-ga14c5b4",
+			"Rev": "a14c5b47c7efa4ff80cc42e1079a34b4756f2311"
+		},
+		{
+			"ImportPath": "github.com/docker/machine/drivers",
+			"Comment": "0.0.2-42-g7a42564",
+			"Rev": "7a425647a09bba6fbffed2edc22be5d470da383b"
+		},
+		{
+			"ImportPath": "github.com/docker/machine/state",
+			"Comment": "0.0.2-42-g7a42564",
+			"Rev": "7a425647a09bba6fbffed2edc22be5d470da383b"
+		},
+		{
+			"ImportPath": "github.com/golang/example/stringutil",
+			"Rev": "ec2c99bcdde76235a0ed4e2b7824b1727e2acc6e"
+		}
+	]
+}
