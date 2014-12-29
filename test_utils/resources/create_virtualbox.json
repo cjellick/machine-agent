@@ -1,24 +1,3 @@
-package events
-
-type Event struct {
-	Name                         string
-	Id                           string
-	PreviousIds                  string
-	previousNames                string
-	publisher                    string
-	replyTo                      string
-	resourceId                   string
-	resourceType                 string
-	time                         string
-	timeoutMillis                string
-	transitioning                string
-	transitioningInternalMessage string
-	transitioningMessage         string
-	transitioningProgress        string
-	Data                         map[string]string
-}
-
-/*
 {
     "context": {
         "logicName": "demo",
@@ -38,13 +17,8 @@ type Event struct {
         "driver": "virtualbox",
         "kind": "dockerMachine",
         "name": "test-random-280937",
-        "virtualboxMemory": "2048"
-		"virtualboxDiskSize":
-        "virtualboxBoot2dockerUrl":
-        "digitaloceanImage":
-        "digitaloceanRegion":
-        "digitaloceanSize":
-        "digitaloceanAccessToken":
+        "virtualboxMemory": "2048",
+        "virtualbox": "40000"
     },
     "id": "190ad7e5-fa1d-4e28-97a2-b9b1bad3f6a8",
     "name": "physicalhost.activate;handler=demo",
@@ -61,5 +35,3 @@ type Event struct {
     "transitioningMessage": null,
     "transitioningProgress": null
 }
-
-*/

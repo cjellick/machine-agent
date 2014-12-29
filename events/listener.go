@@ -21,7 +21,7 @@ type EventRouter struct {
 
 func (client *EventRouter) Start() {
 	// TODO Harden. Add reconnect logic.
-	resp, err := http.Get(client.url)
+	resp, err := http.Post(client.url, "application/json", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -34,6 +34,8 @@ func (client *EventRouter) Start() {
 }
 
 func routeEvent(rawEvent []byte) {
+	strEvent := string(rawEvent[:])
+	log.Printf("Received event %v", strEvent)
 	event := &Event{}
 	err := json.Unmarshal(rawEvent, &event)
 	if err != nil {
