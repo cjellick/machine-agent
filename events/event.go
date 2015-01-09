@@ -4,18 +4,26 @@ type Event struct {
 	Name                         string
 	Id                           string
 	PreviousIds                  string
-	previousNames                string
-	publisher                    string
-	replyTo                      string
-	resourceId                   string
-	resourceType                 string
-	time                         string
-	timeoutMillis                string
-	transitioning                string
-	transitioningInternalMessage string
-	transitioningMessage         string
-	transitioningProgress        string
-	Data                         map[string]string
+	PreviousNames                string
+	Publisher                    string
+	ReplyTo                      string
+	ResourceId                   string
+	ResourceType                 string
+	Transitioning                string
+	TransitioningInternalMessage string
+	TransitioningMessage         string
+	TransitioningProgress        string
+	Data                         map[string]interface{}
+}
+
+type ReplyEvent struct {
+	Name        string                 `json:"name"`
+	PreviousIds []string               `json:"previousIds"`
+	Data        map[string]interface{} `json:"data"`
+}
+
+func NewReplyEvent() *ReplyEvent {
+	return &ReplyEvent{}
 }
 
 /*

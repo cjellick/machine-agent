@@ -1,7 +1,7 @@
 {
     "context": {
         "logicName": "demo",
-        "logicPath": "physicalhost.activate->(demo)",
+        "logicPath": "physicalhost.activate->(dockerMachineAgent)",
         "prettyProcess": "physicalhost.activate",
         "prettyResource": "physicalHost:1",
         "processId": "30",
@@ -16,12 +16,13 @@
     "data": {
         "driver": "virtualbox",
         "kind": "dockerMachine",
-        "name": "test-random-280937",
+        "name": "test",
         "virtualboxMemory": "2048",
-        "virtualbox": "40000"
+        "virtualbox": "40000",
+        "options": {}
     },
     "id": "190ad7e5-fa1d-4e28-97a2-b9b1bad3f6a8",
-    "name": "physicalhost.activate;handler=demo",
+    "name": "physicalhost.create;handler=dockerMachineAgent",
     "previousIds": null,
     "previousNames": null,
     "publisher": null,

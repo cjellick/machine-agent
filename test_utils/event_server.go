@@ -9,6 +9,10 @@ import (
 
 var subscriberChannels []chan string
 
+func publishHandler(w http.ResponseWriter, req *http.Request) {
+	io.WriteString(w, "A response.")
+}
+
 func pushEventHandler(w http.ResponseWriter, req *http.Request) {
 	bod, err := ioutil.ReadAll(req.Body)
 	if err != nil {
@@ -26,8 +30,11 @@ func subscribeHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func pushToSubscribers(message string) {
-	for i := range subscriberChannels {
-		subscriberChannels[i] <- message
+	if len(subscriberChannels) > 0 {
+		for i := range subscriberChannels {
+			log.Printf("sending events: %s", message)
+			subscriberChannels[i] <- message
+		}
 	}
 }
 
@@ -40,11 +47,29 @@ func writeEventToSubscriber(w http.ResponseWriter, c chan string) {
 	}
 }
 
-func InitializeServer(port string) {
+func readyHandler(w http.ResponseWriter, req *http.Request) {
+	io.WriteString(w, "Ready")
+}
+
+func InitializeServer(port string, ready chan string) (err error) {
 	http.HandleFunc("/subscribe", subscribeHandler)
+	http.HandleFunc("/publish", publishHandler)
 	http.HandleFunc("/pushEvent", pushEventHandler)
-	err := http.ListenAndServe(":"+port, nil)
-	if err != nil {
-		log.Fatal("Failed to start event server: ", err)
+	http.HandleFunc("/ready", readyHandler)
+	go http.ListenAndServe(":"+port, nil)
+
+	readyUrl := "http://localhost:" + port + "/pushEvent"
+	for {
+		resp, err := http.Post(readyUrl, "application/json", nil)
+		// TODO This was added when I was debuggin. Might not need it now.
+		if err == nil {
+			log.Println(resp.Status)
+			break
+		} else {
+			log.Fatal(err)
+		}
 	}
+
+	ready <- "Ready!"
+	return nil
 }
