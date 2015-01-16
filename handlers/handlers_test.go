@@ -41,7 +41,7 @@ func setUp() *events.EventRouter {
 
 func TestHandler(t *testing.T) {
 	setUp()
-	err := prepAndPostEvent("../../test_utils/resources/create_virtualbox.json")
+	err := prepAndPostEvent("../test_utils/resources/create_virtualbox.json")
 	checkError(err, t)
 	time.Sleep(500 * time.Millisecond)
 }

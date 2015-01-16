@@ -2,6 +2,7 @@ package events
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -30,12 +31,22 @@ func (router *EventRouter) Start(ready chan<- bool) (err error) {
 	}
 	registerForm := url.Values{}
 	subscribeForm := url.Values{}
+	// TODO Understand need/function of UUID
 	registerForm.Set("uuid", router.name)
 	registerForm.Set("name", router.name)
 	registerForm.Set("priority", strconv.Itoa(router.priority))
 
 	eventHandlerSuffix := ";handler=" + router.name
 	handlers := map[string]EventHandler{}
+
+	if pingHandler, ok := router.eventHandlers["ping"]; ok {
+		// Ping doesnt need registered in the POST and
+		// ping events don't have the handler suffix. If we
+		// start handling other non-suffix events,
+		// we might consider improving this.
+		handlers["ping"] = pingHandler
+	}
+
 	for event, handler := range router.eventHandlers {
 		registerForm.Add("processNames", event)
 		fullEventKey := event + eventHandlerSuffix
@@ -65,6 +76,13 @@ func (router *EventRouter) Start(ready chan<- bool) (err error) {
 	scanner := bufio.NewScanner(eventStream.Body)
 	for scanner.Scan() {
 		line := scanner.Bytes()
+
+		// TODO Ensure this wont break eventing paradigm
+		line = bytes.TrimSpace(line)
+		if len(line) == 0 {
+			continue
+		}
+
 		select {
 		case worker := <-workers:
 			go worker.DoWork(line, router.replyUrl, handlers, workers)
@@ -87,14 +105,14 @@ type Worker struct {
 func (w *Worker) DoWork(rawEvent []byte, replyUrl string, eventHandlers map[string]EventHandler,
 	workers chan *Worker) {
 	event := &Event{}
+
 	err := json.Unmarshal(rawEvent, &event)
-	log.Printf("Received event %v", event.Name)
 	if err != nil {
-		// TODO FIX
-		log.Println("got an error: ", err)
+		log.Printf("Error unmarshalling event: %v", err)
 	} else {
+		log.Printf("Received event: %v", event.Name)
+
 		if fn, ok := eventHandlers[event.Name]; ok {
-			log.Printf("Routing event %v", event.Name)
 			fn(event, replyUrl)
 		} else {
 			log.Printf("No handler registered for event %v", event.Name)

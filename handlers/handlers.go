@@ -73,3 +73,7 @@ func CreateMachine(event *events.Event, replyUrl string) {
 func ActivateMachine(event *events.Event, replyUrl string) {
 	log.Printf("Activating machine [%s]", event.Data["name"].(string))
 }
+
+func Ping(event *events.Event, replyUrl string) {
+	// No-op ping handler
+}
