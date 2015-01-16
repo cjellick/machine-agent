@@ -20,8 +20,8 @@ func CreateMachine(event *events.Event, replyUrl string) {
 	randomName := event.Data["name"].(string) + strconv.FormatInt(time.Now().Unix(), 10)
 	log.Printf("Beginning create machine event %v %s", event, randomName)
 
-	//cmd := exec.Command("/Users/cjellick/go/src/github.com/docker/machine/machine", "create", "-d", "virtualbox", randomName)
-	cmd := exec.Command("/Users/cjellick/go/src/github.com/docker/machine/machine", "ls")
+	cmd := exec.Command("/Users/cjellick/go/src/github.com/docker/machine/machine", "create", "-d", "virtualbox", randomName)
+	//cmd := exec.Command("/Users/cjellick/go/src/github.com/docker/machine/machine", "ls")
 	r, err := cmd.StdoutPipe()
 	if err != nil {
 		log.Fatal(err)
