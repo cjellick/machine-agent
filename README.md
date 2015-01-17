@@ -1,2 +1,2 @@
-# machine-agent
-Agent for docker machine integration in Rancher
+# DEPRECATED
+## Migrated to https://github.com/rancherio/go-machine-service 
