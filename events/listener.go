@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"github.com/cjellick/machine-agent/locks"
 	"log"
 	"net/http"
 	"net/url"
@@ -104,21 +105,28 @@ type Worker struct {
 
 func (w *Worker) DoWork(rawEvent []byte, replyUrl string, eventHandlers map[string]EventHandler,
 	workers chan *Worker) {
-	event := &Event{}
+	defer func() { workers <- w }()
 
+	event := &Event{}
 	err := json.Unmarshal(rawEvent, &event)
 	if err != nil {
 		log.Printf("Error unmarshalling event: %v", err)
-	} else {
-		log.Printf("Received event: %v", event.Name)
-
-		if fn, ok := eventHandlers[event.Name]; ok {
-			fn(event, replyUrl)
-		} else {
-			log.Printf("No handler registered for event %v", event.Name)
-		}
+		return
 	}
-	workers <- w
+
+	log.Printf("Received event: %v", event.Name)
+	unlocker := locks.Lock(event.ResourceId)
+	if unlocker == nil {
+		log.Printf("Resouce [%v] locked. Dropping event.", event.ResourceId)
+		return
+	}
+	defer unlocker.Unlock()
+
+	if fn, ok := eventHandlers[event.Name]; ok {
+		fn(event, replyUrl)
+	} else {
+		log.Printf("No handler registered for event %v", event.Name)
+	}
 }
 
 func NewEventRouter(name string, priority int, baseUrl string,

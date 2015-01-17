@@ -36,6 +36,7 @@ func TestSimpleRouting(t *testing.T) {
 	preCount := 0
 	pre := func(event *Event) {
 		event.Id = strconv.Itoa(preCount)
+		event.ResourceId = strconv.FormatInt(time.Now().UnixNano(), 10)
 		preCount += 1
 		event.Name = "physicalhost.create;handler=testRouter"
 	}
@@ -84,6 +85,7 @@ func TestEventDropping(t *testing.T) {
 	preCount := 0
 	pre := func(event *Event) {
 		event.Id = strconv.Itoa(preCount)
+		event.ResourceId = strconv.FormatInt(time.Now().UnixNano(), 10)
 		preCount += 1
 		event.Name = "physicalhost.create;handler=testRouter"
 	}
@@ -126,6 +128,7 @@ func TestWorkerReuse(t *testing.T) {
 	preCount := 1
 	pre := func(event *Event) {
 		event.Id = strconv.Itoa(preCount)
+		event.ResourceId = strconv.FormatInt(time.Now().UnixNano(), 10)
 		preCount += 1
 		event.Name = "physicalhost.create;handler=testRouter"
 	}
